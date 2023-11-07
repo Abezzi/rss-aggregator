@@ -19,17 +19,8 @@ func main() {
 		log.Fatal("PORT not found in the .env file")
 	}
 
+	// create chi router
 	router := chi.NewRouter()
-	srv := &http.Server{
-		Handler: router,
-		Addr:    ":" + portString,
-	}
-
-	v1Router := chi.NewRouter()
-
-	// to check if server is alive and running
-	v1Router.HandleFunc("/healthz", handlerReadiness)
-	router.Mount("/v1", v1Router)
 
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
@@ -39,6 +30,21 @@ func main() {
 		AllowCredentials: false,
 		MaxAge:           300,
 	}))
+
+	// creates chi router v1
+	v1Router := chi.NewRouter()
+
+	// to check if server is alive and running
+	v1Router.Get("/healthz", handlerReadiness)
+	// to check if error are being handled correctly
+	v1Router.Get("/err", handlerErr)
+
+	router.Mount("/v1", v1Router)
+
+	srv := &http.Server{
+		Handler: router,
+		Addr:    ":" + portString,
+	}
 
 	fmt.Println("Server running at port: ", portString)
 	err := srv.ListenAndServe()
