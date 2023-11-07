@@ -25,6 +25,12 @@ func main() {
 		Addr:    ":" + portString,
 	}
 
+	v1Router := chi.NewRouter()
+
+	// to check if server is alive and running
+	v1Router.HandleFunc("/healthz", handlerReadiness)
+	router.Mount("/v1", v1Router)
+
 	router.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
