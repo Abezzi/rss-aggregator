@@ -1,0 +1,4 @@
+# compiled bin
+rss-aggregator
+# env variables
+.env
